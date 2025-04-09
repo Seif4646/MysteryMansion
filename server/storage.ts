@@ -131,14 +131,23 @@ export class MemStorage implements IStorage {
     const room = await this.getRoomByCode(code);
     if (!room) return false;
     
-    const updatedRoom = { ...room, gameState };
+    console.log('Updating game state for room:', code, JSON.stringify(gameState));
+    
+    // Make sure to create a deep copy of gameState to avoid reference issues
+    const gameStateCopy = JSON.parse(JSON.stringify(gameState));
+    const updatedRoom = { ...room, gameState: gameStateCopy };
     this.rooms.set(room.id, updatedRoom);
     return true;
   }
   
   async getRoomGameState(code: string): Promise<GameState | undefined> {
     const room = await this.getRoomByCode(code);
-    return room?.gameState as GameState | undefined;
+    if (!room) return undefined;
+    
+    // Log the game state when retrieving
+    const gameState = room.gameState as GameState | undefined;
+    console.log('Retrieved game state for room:', code, JSON.stringify(gameState));
+    return gameState;
   }
 
   // Game methods
