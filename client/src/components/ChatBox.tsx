@@ -19,6 +19,7 @@ const ChatBox: React.FC = () => {
   const { currentPlayer } = useGame();
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState('');
+  const [minimized, setMinimized] = useState(false);
   const messageEndRef = useRef<HTMLDivElement>(null);
   
   // Set up WebSocket message handler for chat messages
@@ -73,63 +74,81 @@ const ChatBox: React.FC = () => {
   };
 
   return (
-    <Card className="flex flex-col h-full">
-      <CardHeader className="p-4 pb-0">
-        <CardTitle className="text-lg">{t('chat.title')}</CardTitle>
+    <Card className="flex flex-col h-full shadow-lg border border-primary/30">
+      <CardHeader className="p-2 pb-0 cursor-pointer" onClick={() => setMinimized(!minimized)}>
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-lg flex items-center">
+            <span className="mr-2">💬</span> {t('chat.title')}
+          </CardTitle>
+          <button 
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMinimized(!minimized);
+            }}
+          >
+            <span className="text-xs">{minimized ? '▲' : '▼'}</span>
+          </button>
+        </div>
       </CardHeader>
-      <CardContent className="flex-grow p-4 overflow-hidden">
-        <ScrollArea className="h-[300px] pr-4">
-          {messages.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-gray-400">
-              {t('chat.no_messages')}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {messages.map((message, index) => (
-                <div 
-                  key={index} 
-                  className={`flex flex-col ${message.playerId === currentPlayer?.id ? 'items-end' : ''}`}
-                >
-                  <div 
-                    className={`
-                      px-3 py-2 rounded-lg max-w-[80%] break-words
-                      ${message.playerId === currentPlayer?.id 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted'}
-                    `}
-                  >
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="font-medium text-xs">
-                        {message.playerId === currentPlayer?.id ? t('chat.you') : message.playerName}
-                      </span>
-                      <span className="text-xs opacity-70 ml-2">
-                        {formatTime(message.timestamp)}
-                      </span>
-                    </div>
-                    <div>{message.text}</div>
-                  </div>
+      
+      {!minimized && (
+        <>
+          <CardContent className="flex-grow p-3 overflow-hidden">
+            <ScrollArea className="h-[250px] pr-2">
+              {messages.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+                  {t('chat.no_messages')}
                 </div>
-              ))}
-              <div ref={messageEndRef} />
-            </div>
-          )}
-        </ScrollArea>
-      </CardContent>
-      <CardFooter className="p-4 pt-2">
-        <form className="flex w-full space-x-2" onSubmit={handleSendMessage}>
-          <Input
-            type="text"
-            value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
-            placeholder={t('chat.type_message')}
-            className="flex-grow"
-            maxLength={500}
-          />
-          <Button type="submit" disabled={!messageText.trim()}>
-            {t('chat.send')}
-          </Button>
-        </form>
-      </CardFooter>
+              ) : (
+                <div className="space-y-3">
+                  {messages.map((message, index) => (
+                    <div 
+                      key={index} 
+                      className={`flex flex-col ${message.playerId === currentPlayer?.id ? 'items-end' : ''}`}
+                    >
+                      <div 
+                        className={`
+                          px-3 py-2 rounded-lg max-w-[80%] break-words text-sm
+                          ${message.playerId === currentPlayer?.id 
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'bg-muted'}
+                        `}
+                      >
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="font-medium text-xs">
+                            {message.playerId === currentPlayer?.id ? t('chat.you') : message.playerName}
+                          </span>
+                          <span className="text-xs opacity-70 ml-2">
+                            {formatTime(message.timestamp)}
+                          </span>
+                        </div>
+                        <div>{message.text}</div>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messageEndRef} />
+                </div>
+              )}
+            </ScrollArea>
+          </CardContent>
+          <CardFooter className="p-2">
+            <form className="flex w-full space-x-2" onSubmit={handleSendMessage}>
+              <Input
+                type="text"
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                placeholder={t('chat.type_message')}
+                className="flex-grow text-sm h-8"
+                maxLength={500}
+              />
+              <Button type="submit" size="sm" disabled={!messageText.trim()}>
+                {t('chat.send')}
+              </Button>
+            </form>
+          </CardFooter>
+        </>
+      )}
     </Card>
   );
 };

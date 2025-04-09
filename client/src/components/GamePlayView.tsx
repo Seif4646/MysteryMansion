@@ -278,7 +278,7 @@ const GamePlayView = () => {
       <GameResultModal />
       
       {/* Chat Section - Added as overlay at the bottom right */}
-      <div className="fixed bottom-4 right-4 w-80 h-96 z-10">
+      <div className="fixed bottom-4 right-4 w-72 z-10">
         <ChatBox />
       </div>
     </div>

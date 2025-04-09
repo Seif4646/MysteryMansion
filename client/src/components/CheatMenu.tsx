@@ -39,6 +39,7 @@ const CheatMenu: React.FC = () => {
   useEffect(() => {
     const handleSolutionRevealed = (event: CustomEvent) => {
       if (event.detail?.type === 'solution_revealed') {
+        console.log('Solution revealed:', event.detail.payload.solution);
         setSolution(event.detail.payload.solution);
       }
     };

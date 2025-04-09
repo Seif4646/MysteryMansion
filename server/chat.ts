@@ -68,6 +68,8 @@ export async function handleGetSolution(clientId: string): Promise<void> {
       });
     }
     
+    console.log('Sending solution to player:', player.name, gameState.solution);
+    
     // Send solution to the player
     sendToClient(clientId, {
       type: 'solution_revealed',
