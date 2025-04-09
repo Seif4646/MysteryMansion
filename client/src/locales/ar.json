@@ -98,5 +98,15 @@
     "conservatory": "الحديقة الداخلية",
     "kitchen": "المطبخ",
     "center": "الوسط"
-  }
+  },
+  
+  "chat": "محادثة",
+  "typeMessage": "اكتب رسالة...",
+  "send": "إرسال",
+  "noChatMessages": "لا توجد رسائل بعد. ابدأ الدردشة!",
+  
+  "showCheat": "إظهار الحل",
+  "hideCheat": "إخفاء الحل",
+  "secretSolution": "الحل السري",
+  "cheatEnabled": "تم تفعيل وضع الغش"
 }

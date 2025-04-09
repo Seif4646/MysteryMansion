@@ -98,5 +98,22 @@
     "conservatory": "Conservatory",
     "kitchen": "Kitchen",
     "center": "Center"
+  },
+  
+  "chat": {
+    "title": "Chat",
+    "type_message": "Type a message...",
+    "send": "Send",
+    "no_messages": "No messages yet. Start chatting!",
+    "you": "You"
+  },
+  
+  "cheat": {
+    "title": "Detective Cheat Mode",
+    "description": "As a special detective, you have access to confidential case information.",
+    "secret": "SECRET",
+    "reveal_solution": "Reveal Secret Solution",
+    "solution_title": "The Confidential Case File",
+    "disclaimer": "This information is for authorized eyes only. Use with discretion."
   }
 }

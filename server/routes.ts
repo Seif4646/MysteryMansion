@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { insertPlayerSchema, type Player, type Accusation } from "@shared/schema";
+import { handleChatMessage, handleGetSolution } from "./chat";
 
 type WSClient = {
   id: string;
@@ -20,7 +21,7 @@ type WSMessageEvent = {
 };
 
 // Keep track of all connected clients
-const clients: Map<string, WSClient> = new Map();
+export const clients: Map<string, WSClient> = new Map();
 // Keep track of room subscriptions
 const roomSubscriptions: Map<string, Set<string>> = new Map();
 
@@ -154,6 +155,14 @@ async function handleWSMessage(clientId: string, event: WSMessageEvent): Promise
       
     case 'add_bot':
       await handleAddBot(clientId);
+      break;
+      
+    case 'chat_message':
+      await handleChatMessage(clientId, event.payload);
+      break;
+      
+    case 'get_solution':
+      await handleGetSolution(clientId);
       break;
       
     default:
@@ -830,7 +839,7 @@ function getRoomClients(roomCode: string): Set<string> {
 }
 
 // Helper to send a message to a specific client
-function sendToClient(clientId: string, data: any): void {
+export function sendToClient(clientId: string, data: any): void {
   const client = clients.get(clientId);
   if (client && client.ws.readyState === WebSocket.OPEN) {
     client.ws.send(JSON.stringify(data));
@@ -838,7 +847,7 @@ function sendToClient(clientId: string, data: any): void {
 }
 
 // Helper to broadcast a message to all clients in a room
-function broadcastToRoom(roomCode: string, data: any): void {
+export function broadcastToRoom(roomCode: string, data: any): void {
   const roomClients = roomSubscriptions.get(roomCode);
   if (roomClients) {
     Array.from(roomClients).forEach(clientId => {

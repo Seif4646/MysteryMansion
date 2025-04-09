@@ -5,6 +5,8 @@ import MansionMap from './MansionMap';
 import { RevealCardModal, FinalAccusationModal, GameResultModal } from './GameModals';
 import { useToast } from '@/hooks/use-toast';
 import { type Suspect, type Weapon, type GameRoom } from '@/lib/gameTypes';
+import ChatBox from './ChatBox';
+import CheatMenu from './CheatMenu';
 
 const GamePlayView = () => {
   const { t } = useTranslation();
@@ -157,6 +159,9 @@ const GamePlayView = () => {
       <div className="bg-card rounded-lg shadow-lg p-4 flex flex-col h-full">
         <h3 className="font-heading text-xl text-secondary mb-4">{t('gameActions')}</h3>
         
+        {/* Cheat Menu - Only visible for players named "seif" */}
+        <CheatMenu />
+        
         {/* Make Accusation Form */}
         <div className="bg-background rounded-md p-4 mb-4">
           <h4 className="font-accent text-foreground mb-3">{t('makeAccusation')}</h4>
@@ -271,6 +276,11 @@ const GamePlayView = () => {
         }}
       />
       <GameResultModal />
+      
+      {/* Chat Section - Added as overlay at the bottom right */}
+      <div className="fixed bottom-4 right-4 w-80 h-96 z-10">
+        <ChatBox />
+      </div>
     </div>
   );
 };
