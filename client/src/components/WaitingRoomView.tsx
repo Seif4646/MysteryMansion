@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from "@/hooks/use-toast";
 import { useGame } from '@/lib/gameContext';
@@ -7,6 +7,7 @@ import PlayerCard from './PlayerCard';
 const WaitingRoomView = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [addingBot, setAddingBot] = useState(false);
   const { 
     room, 
     players, 
@@ -16,7 +17,8 @@ const WaitingRoomView = () => {
     createRoom,
     joinRoom,
     toggleReady,
-    startGame
+    startGame,
+    addBot
   } = useGame();
 
   const roomCode = room?.code || '';
@@ -66,6 +68,35 @@ const WaitingRoomView = () => {
     
     startGame();
   };
+  
+  const handleAddBot = async () => {
+    if (playerCount >= maxPlayers) {
+      toast({
+        title: t('error'),
+        description: t('maxPlayersReached'),
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setAddingBot(true);
+    try {
+      await addBot();
+      toast({
+        title: t('success'),
+        description: t('botAdded'),
+        variant: "default"
+      });
+    } catch (error: any) {
+      toast({
+        title: t('error'),
+        description: error?.message || t('failedToAddBot'),
+        variant: "destructive"
+      });
+    } finally {
+      setAddingBot(false);
+    }
+  };
 
   const progressPercentage = Math.min(100, (playerCount / maxPlayers) * 100);
 
@@ -105,7 +136,7 @@ const WaitingRoomView = () => {
         ))}
       </div>
       
-      <div className="flex flex-col sm:flex-row justify-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-center gap-4 mb-4">
         {!isHost && (
           <button 
             className={`${isReady ? 'bg-destructive' : 'bg-success'} text-white font-bold py-3 px-6 rounded-md transition-colors hover:bg-opacity-90`}
@@ -134,6 +165,26 @@ const WaitingRoomView = () => {
           </>
         )}
       </div>
+      
+      {/* Add bot button */}
+      {playerCount < maxPlayers && (
+        <div className="flex justify-center">
+          <button 
+            className="bg-primary text-white font-medium py-2 px-4 rounded-md text-sm transition-colors hover:bg-opacity-90 flex items-center gap-2"
+            onClick={handleAddBot}
+            disabled={addingBot}
+          >
+            {addingBot ? (
+              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-1"></span>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            )}
+            {t('addBot')}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

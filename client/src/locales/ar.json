@@ -58,6 +58,11 @@
   "enterValidName": "يرجى إدخال اسم صحيح",
   "nameLengthError": "يجب أن يكون الاسم بين 2-20 حرفاً",
   "connectionError": "فشل الاتصال بالخادم",
+  "addBot": "إضافة بوت",
+  "botAdded": "تمت إضافة بوت إلى اللعبة",
+  "maxPlayersReached": "تم الوصول إلى الحد الأقصى من اللاعبين",
+  "failedToAddBot": "فشل في إضافة بوت",
+  "success": "نجاح",
   
   "cardType": {
     "suspect": "مشتبه به",

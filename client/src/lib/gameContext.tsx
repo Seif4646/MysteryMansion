@@ -44,6 +44,7 @@ type GameContextType = {
   closeRevealCard: () => void;
   resetGame: () => void;
   isPlayerReady: () => boolean;
+  addBot: () => Promise<void>;
 };
 
 // Create context
@@ -203,7 +204,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           toast({
             title: 'Case Solved!',
             description: `${accuser?.name} solved the case!`,
-            variant: "success"
+            variant: "default"
           });
         } else {
           toast({
@@ -373,6 +374,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return player?.ready || false;
   }, [currentPlayer, players]);
   
+  // Add a bot to the game
+  const addBot = useCallback(async () => {
+    if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+      throw new Error('WebSocket not connected');
+    }
+    
+    wsConnection.send(JSON.stringify({
+      type: 'add_bot',
+      payload: {}
+    }));
+  }, []);
+  
   // Context value
   const contextValue: GameContextType = {
     currentPlayer,
@@ -396,7 +409,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     changeRoom,
     closeRevealCard,
     resetGame,
-    isPlayerReady
+    isPlayerReady,
+    addBot
   };
   
   return (

@@ -58,6 +58,11 @@
   "enterValidName": "Please enter a valid name",
   "nameLengthError": "Name must be between 2-20 characters",
   "connectionError": "Failed to connect to the server",
+  "addBot": "Add Bot",
+  "botAdded": "Bot added to the game",
+  "maxPlayersReached": "Maximum number of players reached",
+  "failedToAddBot": "Failed to add bot",
+  "success": "Success",
   
   "cardType": {
     "suspect": "Suspect",

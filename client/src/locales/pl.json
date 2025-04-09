@@ -58,6 +58,11 @@
   "enterValidName": "Proszę podać prawidłowe imię",
   "nameLengthError": "Imię musi mieć od 2 do 20 znaków",
   "connectionError": "Nie udało się połączyć z serwerem",
+  "addBot": "Dodaj Bota",
+  "botAdded": "Bot został dodany do gry",
+  "maxPlayersReached": "Osiągnięto maksymalną liczbę graczy",
+  "failedToAddBot": "Nie udało się dodać bota",
+  "success": "Sukces",
   
   "cardType": {
     "suspect": "Podejrzany",

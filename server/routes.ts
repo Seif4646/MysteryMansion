@@ -150,6 +150,10 @@ async function handleWSMessage(clientId: string, event: WSMessageEvent): Promise
       await handleChangeRoom(clientId, event.payload);
       break;
       
+    case 'add_bot':
+      await handleAddBot(clientId);
+      break;
+      
     default:
       sendToClient(clientId, {
         type: 'error',
@@ -838,5 +842,102 @@ function broadcastToRoom(roomCode: string, data: any): void {
     for (const clientId of roomClients) {
       sendToClient(clientId, data);
     }
+  }
+}
+
+// Handler for adding a bot to the game
+async function handleAddBot(clientId: string): Promise<void> {
+  const client = clients.get(clientId);
+  if (!client || !client.playerId || !client.roomCode) return;
+  
+  try {
+    // Verify player is in a room
+    const room = await storage.getRoomByCode(client.roomCode);
+    if (!room) {
+      return sendToClient(clientId, {
+        type: 'error',
+        payload: { message: 'Room not found' }
+      });
+    }
+    
+    // Check if room is at max capacity
+    if (room.playersCount >= room.maxPlayers) {
+      return sendToClient(clientId, {
+        type: 'error',
+        payload: { message: 'Room is full' }
+      });
+    }
+    
+    // Check if game already started
+    if (room.status === 'playing') {
+      return sendToClient(clientId, {
+        type: 'error',
+        payload: { message: 'Game already in progress' }
+      });
+    }
+    
+    // Generate bot name
+    const botNames = ['Detective Bot', 'Inspector Bot', 'Agent Smith', 'Sherlock AI', 'Mystery Bot', 'Detective Holmes'];
+    const existingPlayers = await storage.getPlayersByRoomCode(client.roomCode);
+    const existingNames = existingPlayers.map(p => p.name);
+    
+    let botName = '';
+    for (const name of botNames) {
+      if (!existingNames.includes(name)) {
+        botName = name;
+        break;
+      }
+    }
+    
+    // If all names are taken, add random number
+    if (!botName) {
+      botName = `Bot ${Math.floor(Math.random() * 1000)}`;
+    }
+    
+    // Create bot player
+    const botData = {
+      name: botName,
+      sessionId: `bot_${nanoid()}`,
+      roomCode: client.roomCode,
+      isHost: false
+    };
+    
+    const botPlayer = await storage.createPlayer(botData);
+    
+    // Automatically set the bot as ready
+    await storage.updatePlayer(botPlayer.id, { ready: true });
+    
+    // Update room player count
+    await storage.updateRoom(room.id, { 
+      playersCount: room.playersCount + 1 
+    });
+    
+    // Get all players in the room after adding bot
+    const updatedPlayers = await storage.getPlayersByRoomCode(client.roomCode);
+    
+    // Notify all clients in the room about the new bot
+    broadcastToRoom(client.roomCode, {
+      type: 'player_joined',
+      payload: { player: botPlayer, players: updatedPlayers }
+    });
+    
+    // Notify that bot is ready
+    broadcastToRoom(client.roomCode, {
+      type: 'player_ready_changed',
+      payload: { playerId: botPlayer.id, ready: true }
+    });
+    
+    // Notify the client that added the bot
+    sendToClient(clientId, {
+      type: 'bot_added',
+      payload: { botPlayer }
+    });
+    
+  } catch (error) {
+    console.error('Error adding bot:', error);
+    sendToClient(clientId, {
+      type: 'error',
+      payload: { message: 'Could not add bot' }
+    });
   }
 }
