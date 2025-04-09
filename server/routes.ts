@@ -62,14 +62,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (client && client.roomCode) {
         // Notify others in the room about the disconnection
         const roomClients = getRoomClients(client.roomCode);
-        for (const roomClientId of roomClients) {
+        Array.from(roomClients).forEach(roomClientId => {
           if (roomClientId !== clientId) {
             sendToClient(roomClientId, {
               type: 'player_left',
               payload: { playerId: client.playerId }
             });
           }
-        }
+        });
         
         // Remove from room subscription
         removeFromRoom(clientId, client.roomCode);
@@ -108,6 +108,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 async function handleWSMessage(clientId: string, event: WSMessageEvent): Promise<void> {
   const client = clients.get(clientId);
   if (!client) return;
+  
+  console.log(`Received WebSocket message type: ${event.type}`, event.payload);
   
   switch (event.type) {
     case 'register_player':
@@ -839,9 +841,9 @@ function sendToClient(clientId: string, data: any): void {
 function broadcastToRoom(roomCode: string, data: any): void {
   const roomClients = roomSubscriptions.get(roomCode);
   if (roomClients) {
-    for (const clientId of roomClients) {
+    Array.from(roomClients).forEach(clientId => {
       sendToClient(clientId, data);
-    }
+    });
   }
 }
 
