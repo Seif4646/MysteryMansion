@@ -8,10 +8,15 @@ import {
   type Weapon,
   type GameRoom,
   type Accusation,
-  suspects,
-  weapons,
-  rooms as gameRooms
+  suspects as suspectsList,
+  weapons as weaponsList,
+  gameRooms as roomsList
 } from "@shared/schema";
+
+// Convert readonly arrays to regular arrays for iteration
+const suspects = [...suspectsList] as Suspect[];
+const weapons = [...weaponsList] as Weapon[];
+const gameRooms = [...roomsList] as GameRoom[];
 
 // modify the interface with any CRUD methods
 // you might need
@@ -146,23 +151,18 @@ export class MemStorage implements IStorage {
     return result;
   }
 
-  async initializeGame(roomCode: string, playerIds: number[]): Promise<GameState> {
-    // Create array versions of the constants
-    const suspectsArray = [...suspects];
-    const weaponsArray = [...weapons];
-    const roomsArray = [...gameRooms];
-    
+  async initializeGame(roomCode: string, playerIds: number[]): Promise<GameState> {    
     // 1. Get random solution (one suspect, one weapon, one room)
     const solution = {
-      suspect: suspectsArray[Math.floor(Math.random() * suspectsArray.length)],
-      weapon: weaponsArray[Math.floor(Math.random() * weaponsArray.length)],
-      room: roomsArray[Math.floor(Math.random() * roomsArray.length)]
+      suspect: suspects[Math.floor(Math.random() * suspects.length)],
+      weapon: weapons[Math.floor(Math.random() * weapons.length)],
+      room: gameRooms[Math.floor(Math.random() * gameRooms.length)]
     };
     
     // 2. Create copy of remaining cards
-    const remainingSuspects = suspectsArray.filter(s => s !== solution.suspect);
-    const remainingWeapons = weaponsArray.filter(w => w !== solution.weapon);
-    const remainingRooms = roomsArray.filter(r => r !== solution.room);
+    const remainingSuspects = suspects.filter(s => s !== solution.suspect);
+    const remainingWeapons = weapons.filter(w => w !== solution.weapon);
+    const remainingRooms = gameRooms.filter(r => r !== solution.room);
     
     // 3. Shuffle all remaining cards together
     const allCards: Array<{type: string, value: string}> = [
@@ -199,9 +199,9 @@ export class MemStorage implements IStorage {
       solution,
       currentTurn: 0, // Index of the player whose turn it is
       gameCards: {
-        suspects: suspectsArray,
-        weapons: weaponsArray,
-        rooms: roomsArray
+        suspects: suspects,
+        weapons: weapons,
+        rooms: gameRooms
       },
       playerCards
     };
