@@ -147,17 +147,22 @@ export class MemStorage implements IStorage {
   }
 
   async initializeGame(roomCode: string, playerIds: number[]): Promise<GameState> {
+    // Create array versions of the constants
+    const suspectsArray = [...suspects];
+    const weaponsArray = [...weapons];
+    const roomsArray = [...gameRooms];
+    
     // 1. Get random solution (one suspect, one weapon, one room)
     const solution = {
-      suspect: suspects[Math.floor(Math.random() * suspects.length)],
-      weapon: weapons[Math.floor(Math.random() * weapons.length)],
-      room: gameRooms[Math.floor(Math.random() * gameRooms.length)]
+      suspect: suspectsArray[Math.floor(Math.random() * suspectsArray.length)],
+      weapon: weaponsArray[Math.floor(Math.random() * weaponsArray.length)],
+      room: roomsArray[Math.floor(Math.random() * roomsArray.length)]
     };
     
     // 2. Create copy of remaining cards
-    const remainingSuspects = [...suspects].filter(s => s !== solution.suspect);
-    const remainingWeapons = [...weapons].filter(w => w !== solution.weapon);
-    const remainingRooms = [...gameRooms].filter(r => r !== solution.room);
+    const remainingSuspects = suspectsArray.filter(s => s !== solution.suspect);
+    const remainingWeapons = weaponsArray.filter(w => w !== solution.weapon);
+    const remainingRooms = roomsArray.filter(r => r !== solution.room);
     
     // 3. Shuffle all remaining cards together
     const allCards: Array<{type: string, value: string}> = [
@@ -194,9 +199,9 @@ export class MemStorage implements IStorage {
       solution,
       currentTurn: 0, // Index of the player whose turn it is
       gameCards: {
-        suspects: [...suspects],
-        weapons: [...weapons],
-        rooms: [...gameRooms]
+        suspects: suspectsArray,
+        weapons: weaponsArray,
+        rooms: roomsArray
       },
       playerCards
     };
@@ -232,13 +237,13 @@ export class MemStorage implements IStorage {
       if (!playerCardsList) continue;
       
       // Check if player has any of the accused cards
-      if (playerCardsList.includes(accusation.suspect)) {
+      if (playerCardsList.some(card => card === accusation.suspect)) {
         return { cardType: 'suspect', cardValue: accusation.suspect, playerId: player.id };
       }
-      if (playerCardsList.includes(accusation.weapon)) {
+      if (playerCardsList.some(card => card === accusation.weapon)) {
         return { cardType: 'weapon', cardValue: accusation.weapon, playerId: player.id };
       }
-      if (playerCardsList.includes(accusation.room)) {
+      if (playerCardsList.some(card => card === accusation.room)) {
         return { cardType: 'room', cardValue: accusation.room, playerId: player.id };
       }
     }
