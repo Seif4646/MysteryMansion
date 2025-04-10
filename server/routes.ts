@@ -628,6 +628,10 @@ async function handleMakeAccusation(clientId: string, payload: any): Promise<voi
       const revealerClient = Array.from(clients.values()).find(c => c.playerId === result.playerId);
       
       if (revealerClient && revealingPlayer) {
+        // Add 1 point to the player who can disprove (for helping solve the case)
+        const updatedPlayer = await storage.addPlayerPoints(result.playerId, 1);
+        console.log(`Player ${updatedPlayer?.name} disproved an accusation and got 1 point! New total: ${updatedPlayer?.points}`);
+        
         // Notify the accuser about who is revealing
         sendToClient(clientId, {
           type: 'card_being_revealed',
@@ -643,11 +647,17 @@ async function handleMakeAccusation(clientId: string, payload: any): Promise<voi
             accuserId: client.playerId,
             possibleCards: [
               { type: result.cardType, value: result.cardValue }
-            ] 
+            ],
+            pointsEarned: 1,
+            totalPoints: updatedPlayer?.points || 0
           }
         });
       }
     } else {
+      // Nobody can disprove - add 2 points to the player who made a good accusation
+      const updatedPlayer = await storage.addPlayerPoints(client.playerId, 2);
+      console.log(`Player ${updatedPlayer?.name} made a correct accusation and got 2 points! New total: ${updatedPlayer?.points}`);
+      
       // Nobody can disprove
       broadcastToRoom(client.roomCode, {
         type: 'accusation_not_disproved',
@@ -657,7 +667,9 @@ async function handleMakeAccusation(clientId: string, payload: any): Promise<voi
             suspect: accusation.suspect,
             weapon: accusation.weapon,
             room: accusation.room
-          }
+          },
+          pointsEarned: 2,
+          totalPoints: updatedPlayer?.points || 0
         }
       });
     }
@@ -717,14 +729,20 @@ async function handleMakeFinalAccusation(clientId: string, payload: any): Promis
       if (room) {
         await storage.updateRoom(room.id, { status: 'ended' });
         
+        // Add points to the winning player - 10 points for solving the case!
+        const updatedPlayer = await storage.addPlayerPoints(client.playerId, 10);
+        console.log(`Player ${updatedPlayer?.name} won the game and got 10 points! New total: ${updatedPlayer?.points}`);
+        
         // Get the solution to send to all clients
         const gameState = await storage.getRoomGameState(client.roomCode);
         
+        // Notify all players about the player's victory and updated points
         broadcastToRoom(client.roomCode, {
           type: 'game_ended',
           payload: { 
             winner: client.playerId,
-            solution: gameState?.solution
+            solution: gameState?.solution,
+            winnerPoints: updatedPlayer?.points || 0
           }
         });
       }

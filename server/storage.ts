@@ -28,6 +28,7 @@ export interface IStorage {
   createPlayer(player: InsertPlayer): Promise<Player>;
   updatePlayer(id: number, updates: Partial<Player>): Promise<Player | undefined>;
   deletePlayer(id: number): Promise<boolean>;
+  addPlayerPoints(id: number, points: number): Promise<Player | undefined>; // Add points to player
   
   // Room methods
   getRoom(id: number): Promise<Room | undefined>;
@@ -75,7 +76,14 @@ export class MemStorage implements IStorage {
 
   async createPlayer(insertPlayer: InsertPlayer): Promise<Player> {
     const id = this.playerIdCounter++;
-    const player: Player = { ...insertPlayer, id, ready: false };
+    const player: Player = { 
+      ...insertPlayer, 
+      id, 
+      ready: false,
+      points: 0, // Initialize points for new player
+      roomCode: insertPlayer.roomCode || null,
+      isHost: insertPlayer.isHost || false // Default to false if not provided
+    };
     this.players.set(id, player);
     return player;
   }
@@ -91,6 +99,21 @@ export class MemStorage implements IStorage {
 
   async deletePlayer(id: number): Promise<boolean> {
     return this.players.delete(id);
+  }
+  
+  async addPlayerPoints(id: number, points: number): Promise<Player | undefined> {
+    const player = this.players.get(id);
+    if (!player) return undefined;
+    
+    const currentPoints = player.points || 0;
+    const updatedPlayer = { 
+      ...player, 
+      points: currentPoints + points 
+    };
+    
+    this.players.set(id, updatedPlayer);
+    console.log(`Added ${points} points to player ${player.name}. New total: ${updatedPlayer.points}`);
+    return updatedPlayer;
   }
 
   // Room methods
@@ -112,6 +135,9 @@ export class MemStorage implements IStorage {
       id, 
       status: "waiting", 
       playersCount: 0,
+      maxPlayers: insertRoom.maxPlayers || 6, // Default max players
+      minPlayers: insertRoom.minPlayers || 2, // Default min players
+      gameState: {}, // Initialize empty game state
       createdAt 
     };
     this.rooms.set(id, room);

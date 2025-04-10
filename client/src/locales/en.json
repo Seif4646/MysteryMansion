@@ -63,6 +63,7 @@
   "maxPlayersReached": "Maximum number of players reached",
   "failedToAddBot": "Failed to add bot",
   "success": "Success",
+  "points": "Points",
   
   "cardType": {
     "suspect": "Suspect",

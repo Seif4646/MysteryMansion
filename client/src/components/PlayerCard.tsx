@@ -16,15 +16,23 @@ const PlayerCard = ({ player, isCurrentPlayer }: PlayerCardProps) => {
         <span className="material-icons text-primary-foreground">person</span>
       </div>
       <div className="flex-grow">
-        <p className="text-foreground font-medium">
-          {player.name}
-          {player.isHost && (
-            <span className="ml-2 text-secondary text-xs">{t('host')}</span>
-          )}
-          {isCurrentPlayer && (
-            <span className="ml-2 text-info text-xs">{t('you')}</span>
-          )}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-foreground font-medium">
+            {player.name}
+            {player.isHost && (
+              <span className="ml-2 text-secondary text-xs">{t('host')}</span>
+            )}
+            {isCurrentPlayer && (
+              <span className="ml-2 text-info text-xs">{t('you')}</span>
+            )}
+          </p>
+          
+          {/* Points badge */}
+          <div className="flex items-center bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs">
+            <span className="material-icons text-xs mr-1">stars</span>
+            <span>{player.points || 0} {t('points')}</span>
+          </div>
+        </div>
         <p className="text-secondary text-sm">{isReady ? t('ready') : t('waiting')}</p>
       </div>
       <div className={isReady ? "text-success" : "text-muted"}>

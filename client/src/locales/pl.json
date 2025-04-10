@@ -63,6 +63,7 @@
   "maxPlayersReached": "Osiągnięto maksymalną liczbę graczy",
   "failedToAddBot": "Nie udało się dodać bota",
   "success": "Sukces",
+  "points": "Punkty",
   
   "cardType": {
     "suspect": "Podejrzany",

@@ -17,6 +17,7 @@ export const players = pgTable("players", {
   roomCode: text("room_code"),
   ready: boolean("ready").default(false),
   isHost: boolean("is_host").default(false),
+  points: integer("points").notNull().default(0), // Add points field for player score tracking
 });
 
 // Game Rooms

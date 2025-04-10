@@ -63,6 +63,7 @@
   "maxPlayersReached": "تم الوصول إلى الحد الأقصى من اللاعبين",
   "failedToAddBot": "فشل في إضافة بوت",
   "success": "نجاح",
+  "points": "نقاط",
   
   "cardType": {
     "suspect": "مشتبه به",

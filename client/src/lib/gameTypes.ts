@@ -8,6 +8,7 @@ export type Player = {
   roomCode: string | null;
   ready: boolean;
   isHost: boolean;
+  points: number; // Player score points
 };
 
 // Room type
