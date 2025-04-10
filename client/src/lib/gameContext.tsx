@@ -113,6 +113,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   function handleWebSocketMessage(data: any) {
     const { type, payload } = data;
     
+    console.log('GameContext received WebSocket message:', type, payload);
+    
+    // Dispatch a custom event for components that need specific message types
+    const customEvent = new CustomEvent('websocket-message', {
+      detail: data,
+      bubbles: true,
+      cancelable: true
+    });
+    
+    // Dispatch the event to window
+    window.dispatchEvent(customEvent);
+    
     switch (type) {
       case 'connected':
         console.log('Connected with client ID:', payload.clientId);

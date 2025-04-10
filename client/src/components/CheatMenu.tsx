@@ -38,7 +38,9 @@ const CheatMenu: React.FC = () => {
   // Listen for solution reveal events
   useEffect(() => {
     const handleSolutionRevealed = (event: CustomEvent) => {
-      if (event.detail?.type === 'solution_revealed') {
+      console.log('WebSocket event received in CheatMenu:', event.detail);
+      
+      if (event.detail?.type === 'solution_revealed' && event.detail.payload?.solution) {
         console.log('Solution revealed:', event.detail.payload.solution);
         setSolution(event.detail.payload.solution);
       }
@@ -46,10 +48,18 @@ const CheatMenu: React.FC = () => {
 
     window.addEventListener('websocket-message' as any, handleSolutionRevealed);
 
+    // Initial request for solution when component mounts if user is seif
+    if (currentPlayer?.name?.toLowerCase() === 'seif') {
+      console.log('Requesting solution from CheatMenu useEffect');
+      setTimeout(() => {
+        sendMessage('get_solution');
+      }, 1000); // Small delay to ensure connection is ready
+    }
+
     return () => {
       window.removeEventListener('websocket-message' as any, handleSolutionRevealed);
     };
-  }, []);
+  }, [currentPlayer]);
 
   const handleGetSolution = () => {
     sendMessage('get_solution');

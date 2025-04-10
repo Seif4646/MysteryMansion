@@ -26,12 +26,21 @@ const ChatBox: React.FC = () => {
   useEffect(() => {
     // Add listener for the 'chat_message' event on the window object
     const handleChatMessage = (event: CustomEvent) => {
+      console.log('Chat event received:', event.detail);
+      
       if (event.detail?.type === 'chat_message') {
         const message = event.detail.payload;
-        setMessages(prevMessages => [...prevMessages, {
-          ...message,
-          timestamp: new Date(message.timestamp)
-        }]);
+        console.log('Adding new chat message to UI:', message);
+        
+        // Ensure we have all required fields
+        if (message && message.playerId && message.text) {
+          setMessages(prevMessages => [...prevMessages, {
+            playerId: message.playerId,
+            playerName: message.playerName || 'Unknown',
+            text: message.text,
+            timestamp: new Date(message.timestamp || Date.now())
+          }]);
+        }
       }
     };
 
